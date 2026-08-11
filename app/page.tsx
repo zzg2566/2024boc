@@ -69,12 +69,23 @@ const padNumber = (value: number) => String(value).padStart(2, "0");
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<"next" | "previous">("next");
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const activeProfile = youthProfiles[activeIndex];
 
-  const selectProfile = (index: number) => {
-    setActiveIndex((index + youthProfiles.length) % youthProfiles.length);
+  const selectProfile = (index: number, direction?: "next" | "previous") => {
+    const nextIndex = (index + youthProfiles.length) % youthProfiles.length;
+    if (nextIndex === activeIndex) return;
+    setSlideDirection(direction || (nextIndex > activeIndex ? "next" : "previous"));
+    setDragOffset(0);
+    setIsDragging(false);
+    setActiveIndex(nextIndex);
   };
+
+  const showPreviousProfile = () => selectProfile(activeIndex - 1, "previous");
+  const showNextProfile = () => selectProfile(activeIndex + 1, "next");
 
   const scrollToProfiles = () => {
     document.getElementById("youth")?.scrollIntoView({ behavior: "smooth" });
@@ -207,7 +218,7 @@ export default function Home() {
         </div>
 
         <div className="profile-mobile-nav" aria-label="手机端人物切换">
-          <button type="button" onClick={() => selectProfile(activeIndex - 1)} aria-label="上一位青年">
+          <button type="button" onClick={showPreviousProfile} aria-label="上一位青年">
             <span aria-hidden="true">←</span>
           </button>
           <label className="profile-jump">
@@ -225,35 +236,61 @@ export default function Home() {
             </select>
             <small>左右滑动也可切换</small>
           </label>
-          <button type="button" onClick={() => selectProfile(activeIndex + 1)} aria-label="下一位青年">
+          <button type="button" onClick={showNextProfile} aria-label="下一位青年">
             <span aria-hidden="true">→</span>
           </button>
         </div>
 
         <article
-          className="profile-stage"
+          className={`profile-stage slide-${slideDirection}${isDragging ? " is-dragging" : ""}`}
+          key={activeProfile.slot}
           id="profile-stage"
           tabIndex={0}
           aria-live="polite"
+          aria-atomic="true"
           aria-label={`第 ${activeProfile.slot} 位青年资料`}
+          style={dragOffset ? {
+            transform: `translate3d(${dragOffset}px, 0, 0) scale(${1 - Math.min(Math.abs(dragOffset) / 1800, 0.025)})`,
+            opacity: 1 - Math.min(Math.abs(dragOffset) / 700, 0.18),
+          } : undefined}
           onKeyDown={(event) => {
-            if (event.key === "ArrowLeft") selectProfile(activeIndex - 1);
-            if (event.key === "ArrowRight") selectProfile(activeIndex + 1);
+            if (event.key === "ArrowLeft") showPreviousProfile();
+            if (event.key === "ArrowRight") showNextProfile();
           }}
           onTouchStart={(event) => {
             const touch = event.changedTouches[0];
             touchStart.current = { x: touch.clientX, y: touch.clientY };
+            setIsDragging(true);
+          }}
+          onTouchMove={(event) => {
+            const start = touchStart.current;
+            if (!start) return;
+            const touch = event.changedTouches[0];
+            const deltaX = touch.clientX - start.x;
+            const deltaY = touch.clientY - start.y;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+              const resistedOffset = Math.sign(deltaX) * Math.min(Math.abs(deltaX) * .82, 130);
+              setDragOffset(resistedOffset);
+            }
           }}
           onTouchEnd={(event) => {
             const start = touchStart.current;
             touchStart.current = null;
+            setIsDragging(false);
+            setDragOffset(0);
             if (!start) return;
             const touch = event.changedTouches[0];
             const deltaX = touch.clientX - start.x;
             const deltaY = touch.clientY - start.y;
             if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-              selectProfile(activeIndex + (deltaX < 0 ? 1 : -1));
+              if (deltaX < 0) showNextProfile();
+              else showPreviousProfile();
             }
+          }}
+          onTouchCancel={() => {
+            touchStart.current = null;
+            setIsDragging(false);
+            setDragOffset(0);
           }}
         >
           <div className="profile-visual">
@@ -299,14 +336,14 @@ export default function Home() {
         </article>
 
         <div className="profile-controls">
-          <button type="button" onClick={() => selectProfile(activeIndex - 1)} aria-label="上一位青年">
+          <button type="button" onClick={showPreviousProfile} aria-label="上一位青年">
             <span aria-hidden="true">←</span> 上一位
           </button>
           <div className="control-progress" aria-hidden="true">
             <i style={{ width: `${((activeIndex + 1) / youthProfiles.length) * 100}%` }} />
           </div>
           <span><strong>{padNumber(activeIndex + 1)}</strong> / 19</span>
-          <button type="button" onClick={() => selectProfile(activeIndex + 1)} aria-label="下一位青年">
+          <button type="button" onClick={showNextProfile} aria-label="下一位青年">
             下一位 <span aria-hidden="true">→</span>
           </button>
         </div>

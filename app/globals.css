@@ -399,8 +399,20 @@ img { display: block; max-width: 100%; }
   outline: none;
   background: var(--paper-light);
   box-shadow: var(--shadow);
+  transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .22s ease, box-shadow .28s ease;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 .profile-stage:focus-visible { box-shadow: 0 0 0 3px rgba(179,19,42,.3), var(--shadow); }
+.profile-stage.is-dragging { transition: none; box-shadow: 0 18px 42px rgba(56,36,28,.2); }
+.profile-stage.slide-next { animation: profile-slide-next .5s cubic-bezier(.22, 1, .36, 1); }
+.profile-stage.slide-previous { animation: profile-slide-previous .5s cubic-bezier(.22, 1, .36, 1); }
+.profile-stage.slide-next .profile-content { animation: profile-copy-next .48s .045s cubic-bezier(.22, 1, .36, 1) both; }
+.profile-stage.slide-previous .profile-content { animation: profile-copy-previous .48s .045s cubic-bezier(.22, 1, .36, 1) both; }
+.profile-stage.slide-next .profile-visual > img,
+.profile-stage.slide-previous .profile-visual > img,
+.profile-stage.slide-next .photo-placeholder,
+.profile-stage.slide-previous .photo-placeholder { animation: profile-photo-reveal .62s cubic-bezier(.22, 1, .36, 1) both; }
 .profile-visual { position: relative; min-height: 600px; overflow: hidden; background: #911028; }
 .profile-visual > img { width: 100%; height: 100%; object-fit: cover; }
 .profile-visual::after { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(50,0,7,.56), transparent 34%); content: ""; }
@@ -429,7 +441,7 @@ img { display: block; max-width: 100%; }
 .photo-caption span { color: #efd99e; font: 8px/1 Georgia, serif; letter-spacing: .18em; }
 .photo-caption b { font-family: "Songti SC", STSong, serif; font-size: 12px; letter-spacing: .12em; }
 
-.profile-content { padding: 38px clamp(28px, 5vw, 48px) 42px; animation: profile-in .42s ease both; }
+.profile-content { padding: 38px clamp(28px, 5vw, 48px) 42px; }
 .profile-meta { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--line); color: #8b8178; font: 8px/1 Georgia, serif; letter-spacing: .18em; }
 .profile-meta b { color: var(--boc-red); font-weight: 400; }
 .profile-content h3 { margin: 30px 0 7px; font-family: "Songti SC", STSong, serif; font-size: clamp(33px, 5vw, 46px); letter-spacing: .03em; }
@@ -471,7 +483,19 @@ img { display: block; max-width: 100%; }
 .footer-meta p span { margin-right: 7px; color: #d2b871; }
 
 @keyframes rise-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes profile-in { from { opacity: .25; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes profile-slide-next {
+  from { opacity: .2; transform: translate3d(48px, 0, 0) scale(.982); }
+  72% { opacity: 1; transform: translate3d(-3px, 0, 0) scale(1); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes profile-slide-previous {
+  from { opacity: .2; transform: translate3d(-48px, 0, 0) scale(.982); }
+  72% { opacity: 1; transform: translate3d(3px, 0, 0) scale(1); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes profile-copy-next { from { opacity: 0; transform: translate3d(18px, 8px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes profile-copy-previous { from { opacity: 0; transform: translate3d(-18px, 8px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes profile-photo-reveal { from { opacity: .62; transform: scale(1.055); } to { opacity: 1; transform: scale(1); } }
 @keyframes scroll-drop { 0% { transform: translateY(-18px); } 60%, 100% { transform: translateY(48px); } }
 @keyframes slow-turn { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
@@ -509,7 +533,8 @@ img { display: block; max-width: 100%; }
     box-shadow: 0 9px 25px rgba(54,38,31,.12);
     backdrop-filter: blur(12px);
   }
-  .profile-mobile-nav > button { min-height: 46px; border: 0; background: var(--boc-red); color: white; font-size: 21px; cursor: pointer; }
+  .profile-mobile-nav > button { min-height: 46px; border: 0; background: var(--boc-red); color: white; font-size: 21px; cursor: pointer; transition: transform .18s ease, background .18s ease; }
+  .profile-mobile-nav > button:active { transform: scale(.93); background: #8f0d22; }
   .profile-jump { position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 8px; min-width: 0; padding: 4px 10px; border: 1px solid var(--line); background: white; }
   .profile-jump > span { color: var(--boc-red); font-size: 9px; font-weight: 700; letter-spacing: .08em; }
   .profile-jump select { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: #332d29; font: 600 13px/1.2 "Microsoft YaHei", sans-serif; }
