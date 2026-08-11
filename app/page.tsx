@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type YouthProfile = {
   slot: number;
@@ -69,6 +69,7 @@ const padNumber = (value: number) => String(value).padStart(2, "0");
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const activeProfile = youthProfiles[activeIndex];
 
   const selectProfile = (index: number) => {
@@ -205,6 +206,30 @@ export default function Home() {
           ))}
         </div>
 
+        <div className="profile-mobile-nav" aria-label="手机端人物切换">
+          <button type="button" onClick={() => selectProfile(activeIndex - 1)} aria-label="上一位青年">
+            <span aria-hidden="true">←</span>
+          </button>
+          <label className="profile-jump">
+            <span>选择青年</span>
+            <select
+              value={activeIndex}
+              onChange={(event) => selectProfile(Number(event.target.value))}
+              aria-controls="profile-stage"
+            >
+              {youthProfiles.map((profile, index) => (
+                <option value={index} key={profile.slot}>
+                  {padNumber(profile.slot)} · {profile.name || "资料待补"}
+                </option>
+              ))}
+            </select>
+            <small>左右滑动也可切换</small>
+          </label>
+          <button type="button" onClick={() => selectProfile(activeIndex + 1)} aria-label="下一位青年">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
         <article
           className="profile-stage"
           id="profile-stage"
@@ -214,6 +239,21 @@ export default function Home() {
           onKeyDown={(event) => {
             if (event.key === "ArrowLeft") selectProfile(activeIndex - 1);
             if (event.key === "ArrowRight") selectProfile(activeIndex + 1);
+          }}
+          onTouchStart={(event) => {
+            const touch = event.changedTouches[0];
+            touchStart.current = { x: touch.clientX, y: touch.clientY };
+          }}
+          onTouchEnd={(event) => {
+            const start = touchStart.current;
+            touchStart.current = null;
+            if (!start) return;
+            const touch = event.changedTouches[0];
+            const deltaX = touch.clientX - start.x;
+            const deltaY = touch.clientY - start.y;
+            if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+              selectProfile(activeIndex + (deltaX < 0 ? 1 : -1));
+            }
           }}
         >
           <div className="profile-visual">
