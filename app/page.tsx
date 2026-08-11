@@ -269,7 +269,6 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-brand">
-          <img src="/boc-logo.jpg" alt="中国银行标志" />
           <div><strong>青学笃行｜青年学习</strong><span>中国银行益阳分行团青主题 H5</span></div>
         </div>
         <div className="footer-meta">
