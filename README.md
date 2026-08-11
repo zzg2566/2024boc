@@ -2,6 +2,8 @@
 
 中国银行益阳分行青年理论学习主题栏目。页面包含栏目导语、理论研学/团课学习/政策解读/学习感悟四个版块，以及 19 位青年的照片、自我介绍与学习感悟展示位。
 
+在线访问：<https://zzg2566.github.io/2024boc/>
+
 ## 员工素材补录
 
 人物数据集中在 `app/page.tsx` 顶部的 `youthProfiles` 数组。素材到位后：
@@ -21,4 +23,5 @@ pnpm dev
 
 ```bash
 pnpm build
+pnpm export:pages
 ```
