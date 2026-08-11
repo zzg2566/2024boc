@@ -489,13 +489,29 @@ img { display: block; max-width: 100%; }
   .profiles-heading { align-items: flex-start; }
   .profiles-heading > div:first-child > p:last-child { max-width: 210px; line-height: 1.7; }
   .profiles-total strong { font-size: 39px; }
-  .profile-index { display: flex; margin-right: -24px; overflow-x: auto; padding-right: 24px; padding-bottom: 11px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .profile-index { display: flex; margin-top: 28px; margin-right: -24px; overflow-x: auto; padding-right: 24px; padding-bottom: 9px; scrollbar-width: none; scroll-snap-type: x mandatory; }
   .profile-index::-webkit-scrollbar { display: none; }
-  .profile-index button { min-width: 52px; min-height: 54px; scroll-snap-align: start; }
-  .profile-stage { grid-template-columns: 1fr; }
-  .profile-visual { min-height: 480px; }
-  .profile-content { min-height: 540px; }
-  .profile-controls { grid-template-columns: auto 1fr auto; }
+  .profile-index button { min-width: 48px; min-height: 46px; padding: 6px 4px 5px; scroll-snap-align: start; }
+  .profile-stage { grid-template-columns: 1fr; margin-top: 12px; }
+  .profile-visual { height: clamp(200px, 30svh, 240px); min-height: 0; }
+  .photo-placeholder::after { inset: 10px; }
+  .photo-slot { top: 16px; left: 16px; }
+  .portrait-outline { width: 120px; height: 150px; margin-bottom: 8px; transform: scale(.72); }
+  .portrait-outline i { width: 64px; height: 64px; }
+  .portrait-outline b { height: 86px; }
+  .photo-placeholder strong { font-size: 16px; }
+  .photo-placeholder small { margin-top: 6px; }
+  .photo-caption { right: 16px; bottom: 13px; left: 16px; }
+  .profile-content { min-height: 0; padding: 18px 20px 20px; }
+  .profile-meta { padding-bottom: 9px; }
+  .profile-content h3 { margin: 14px 0 4px; font-size: 28px; }
+  .profile-department { font-size: 11px; }
+  .content-block { margin-top: 16px; }
+  .content-label { margin-bottom: 7px; }
+  .content-block > p:last-child { min-height: 0; font-size: 12px; line-height: 1.65; }
+  .reflection-block { padding: 15px 16px 17px; }
+  .reflection-block blockquote { min-height: 0; font-size: 12px; line-height: 1.7; }
+  .profile-controls { grid-template-columns: auto 1fr auto; gap: 11px; margin-top: 14px; }
   .profile-controls > span { display: none; }
   .site-footer { align-items: flex-start; flex-direction: column; }
   .footer-meta { width: 100%; justify-content: space-between; padding-top: 17px; border-top: 1px solid rgba(255,255,255,.08); }
@@ -511,9 +527,17 @@ img { display: block; max-width: 100%; }
   .chapter-nav a { padding: 15px 4px; font-size: 11px; letter-spacing: .08em; }
   .heading-stamp { font-size: 13px; }
   .quote-band { padding-top: 64px; padding-bottom: 64px; }
-  .profile-visual { min-height: 440px; }
-  .portrait-outline { transform: scale(.84); }
+  .profile-visual { height: clamp(190px, 29svh, 220px); min-height: 0; }
+  .portrait-outline { transform: scale(.66); }
   .profile-controls { gap: 10px; }
+}
+
+@media (max-width: 680px) and (max-height: 720px) {
+  .profile-visual { height: 180px; }
+  .profile-content { padding-top: 14px; padding-bottom: 16px; }
+  .profile-content h3 { margin-top: 11px; }
+  .content-block { margin-top: 12px; }
+  .reflection-block { padding-top: 12px; padding-bottom: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
