@@ -137,7 +137,14 @@ img { display: block; max-width: 100%; }
   background: white;
   box-shadow: 0 5px 18px rgba(56,0,8,.22);
 }
-.brand-mark img { width: 36px; height: 36px; object-fit: cover; border-radius: 50%; }
+.brand-mark img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  object-position: 50% 44%;
+  border-radius: 50%;
+  transform: translateY(-1px);
+}
 .brand-copy { display: flex; flex-direction: column; gap: 3px; }
 .brand-copy strong { font-family: "Songti SC", STSong, SimSun, serif; font-size: 15px; letter-spacing: .16em; }
 .brand-copy small { color: rgba(255,255,255,.64); font: 7px/1.4 Georgia, serif; letter-spacing: .14em; }
@@ -455,7 +462,14 @@ img { display: block; max-width: 100%; }
 
 .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 25px; padding: 30px clamp(24px, 7vw, 68px) calc(30px + env(safe-area-inset-bottom, 0px)); background: #0f0e0e; color: white; }
 .footer-brand { display: flex; align-items: center; gap: 12px; }
-.footer-brand img { width: 37px; height: 37px; border-radius: 50%; object-fit: cover; }
+.footer-brand img {
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  object-fit: contain;
+  object-position: 50% 44%;
+  transform: translateY(-1px);
+}
 .footer-brand div { display: flex; flex-direction: column; gap: 4px; }
 .footer-brand strong { font-family: "Songti SC", STSong, serif; font-size: 13px; letter-spacing: .05em; }
 .footer-brand span { color: rgba(255,255,255,.38); font-size: 8px; letter-spacing: .08em; }
