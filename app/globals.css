@@ -512,7 +512,19 @@ img { display: block; max-width: 100%; }
   .profiles-heading .section-kicker { margin-bottom: 8px; }
   .profiles-heading > div:first-child > p:last-child { display: none; }
   .profiles-total strong { font-size: 32px; }
-  .profile-index { display: none; }
+  .profile-index {
+    display: flex;
+    margin-top: 14px;
+    margin-right: -24px;
+    overflow-x: auto;
+    padding-right: 24px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .profile-index::-webkit-scrollbar { display: none; }
+  .profile-index button { min-width: 48px; min-height: 46px; padding: 6px 4px 5px; scroll-snap-align: center; }
   .profile-mobile-nav {
     position: sticky;
     z-index: 6;
@@ -535,7 +547,7 @@ img { display: block; max-width: 100%; }
   .profile-jump select { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: #332d29; font: 600 13px/1.2 "Microsoft YaHei", sans-serif; }
   .profile-jump small { grid-column: 1 / -1; color: #9a8f86; font-size: 8px; letter-spacing: .06em; }
   .profile-stage { grid-template-columns: 1fr; margin-top: 8px; touch-action: pan-y; }
-  .profile-visual { height: 120px; min-height: 0; }
+  .profile-visual { height: clamp(200px, 30svh, 240px); min-height: 0; }
   .photo-placeholder::after { inset: 10px; }
   .photo-slot { top: 13px; left: 14px; }
   .portrait-outline { width: 92px; height: 112px; margin: 0; transform: scale(.58); }
@@ -571,7 +583,7 @@ img { display: block; max-width: 100%; }
   .heading-stamp { font-size: 13px; }
   .quote-band { padding-top: 64px; padding-bottom: 64px; }
   .profile-mobile-nav { grid-template-columns: 42px minmax(0, 1fr) 42px; }
-  .profile-visual { height: 110px; min-height: 0; }
+  .profile-visual { height: clamp(190px, 29svh, 220px); min-height: 0; }
   .portrait-outline { transform: scale(.54); }
 }
 
@@ -581,7 +593,7 @@ img { display: block; max-width: 100%; }
   .profiles-heading h2 { font-size: 28px; }
   .profiles-total strong { font-size: 27px; }
   .profile-mobile-nav { margin-top: 12px; }
-  .profile-visual { height: 96px; }
+  .profile-visual { height: 180px; }
   .profile-content { padding-top: 10px; padding-bottom: 11px; }
   .profile-content h3 { font-size: 22px; }
   .content-block { margin-top: 7px; }
