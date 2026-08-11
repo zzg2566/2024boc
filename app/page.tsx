@@ -14,16 +14,29 @@ type YouthProfile = {
 };
 
 // 员工素材到位后，只需替换这里的 19 组内容与 public/people/ 下的照片。
-const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => ({
-  slot: index + 1,
-  name: "",
-  department: "",
-  role: "",
-  image: "",
-  imagePosition: "50% 50%",
-  intro: "",
-  reflection: "",
-}));
+const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => (
+  index === 0
+    ? {
+        slot: 1,
+        name: "张盼",
+        department: "资阳支行",
+        role: "助理综服经理",
+        image: "./people/youth-01.jpg",
+        imagePosition: "70% 58%",
+        intro: "大家好，我叫张盼，目前在资阳支行工作。在今后的工作当中，我希望能和在座各位同事多沟通、多交流，互相学习取长补短，一同成长进步。后续工作上还有很多需要向大家请教的地方，麻烦各位多多关照。",
+        reflection: "作为一名助理综服经理，学习习近平总书记重要回信精神后我深受触动。我读懂了青年要坚定理想、厚植家国情怀，立足平凡岗位勇担使命。柜台是服务群众的一线，今后我会牢记嘱托，锤炼业务本领，用心办好每一笔业务，耐心服务每一位客户。自觉把金融服务融入民生发展，以踏实实干践行青年责任，用基层金融人的微光，为服务实体经济贡献青春力量。",
+      }
+    : {
+        slot: index + 1,
+        name: "",
+        department: "",
+        role: "",
+        image: "",
+        imagePosition: "50% 50%",
+        intro: "",
+        reflection: "",
+      }
+));
 
 const learningTracks = [
   {
