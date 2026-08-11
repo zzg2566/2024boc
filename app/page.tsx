@@ -9,6 +9,7 @@ type YouthProfile = {
   role: string;
   image: string;
   imagePosition: string;
+  imageFit: "cover" | "contain";
   intro: string;
   reflection: string;
 };
@@ -23,6 +24,7 @@ const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => (
         role: "助理综服经理",
         image: "./people/youth-01.jpg",
         imagePosition: "70% 58%",
+        imageFit: "cover",
         intro: "大家好，我叫张盼，目前在资阳支行工作。在今后的工作当中，我希望能和在座各位同事多沟通、多交流，互相学习取长补短，一同成长进步。后续工作上还有很多需要向大家请教的地方，麻烦各位多多关照。",
         reflection: "作为一名助理综服经理，学习习近平总书记重要回信精神后我深受触动。我读懂了青年要坚定理想、厚植家国情怀，立足平凡岗位勇担使命。柜台是服务群众的一线，今后我会牢记嘱托，锤炼业务本领，用心办好每一笔业务，耐心服务每一位客户。自觉把金融服务融入民生发展，以踏实实干践行青年责任，用基层金融人的微光，为服务实体经济贡献青春力量。",
       }
@@ -33,7 +35,8 @@ const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => (
           department: "沅江支行营业部",
           role: "助理综服经理",
           image: "./people/youth-02.jpg",
-          imagePosition: "50% 35%",
+          imagePosition: "50% 50%",
+          imageFit: "contain",
           intro: "大家好，我是李思洁，2024年加入中国银行，现就职于沅江支行营业部。",
           reflection: "参加“国家安全，青春挺膺”主题团日活动后，我作为一名助理综服经理深受警醒与启发。金融安全是国家安全的重要一环，柜台是防范金融风险、守护资金安全的前沿阵地。日常工作中，我会严格落实实名制开户、反诈提醒、可疑交易甄别等制度，细心核验客户信息，主动普及反洗钱、电信诈骗、跨境金融风险知识。以青年之责筑牢金融防线，保持警惕如雄鹰瞭望，严守业务操作规范，抵制危害金融安全的违规行为。把国家安全意识融入每一笔业务办理，立足平凡岗位履职尽责，用专业与坚守守护群众财产安全，以青春力量护航国家金融稳定与安全。",
         }
@@ -44,6 +47,7 @@ const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => (
         role: "",
         image: "",
         imagePosition: "50% 50%",
+        imageFit: "cover",
         intro: "",
         reflection: "",
       }
@@ -304,13 +308,24 @@ export default function Home() {
             setDragOffset(0);
           }}
         >
-          <div className="profile-visual">
+          <div className={`profile-visual fit-${activeProfile.imageFit}`}>
             {activeProfile.image ? (
-              <img
-                src={activeProfile.image}
-                alt={`${activeProfile.name}工作照`}
-                style={{ objectPosition: activeProfile.imagePosition }}
-              />
+              <>
+                {activeProfile.imageFit === "contain" && (
+                  <img
+                    className="profile-photo-backdrop"
+                    src={activeProfile.image}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                )}
+                <img
+                  className="profile-photo"
+                  src={activeProfile.image}
+                  alt={`${activeProfile.name}工作照`}
+                  style={{ objectPosition: activeProfile.imagePosition }}
+                />
+              </>
             ) : (
               <div className="photo-placeholder">
                 <span className="photo-slot">NO. {padNumber(activeProfile.slot)}</span>
