@@ -1,57 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-
-type YouthProfile = {
-  slot: number;
-  name: string;
-  department: string;
-  role: string;
-  image: string;
-  imagePosition: string;
-  imageFit: "cover" | "contain";
-  intro: string;
-  reflection: string;
-};
-
-// 员工素材到位后，只需替换这里的 19 组内容与 public/people/ 下的照片。
-const youthProfiles: YouthProfile[] = Array.from({ length: 19 }, (_, index) => (
-  index === 0
-    ? {
-        slot: 1,
-        name: "张盼",
-        department: "资阳支行",
-        role: "助理综服经理",
-        image: "./people/youth-01.jpg",
-        imagePosition: "70% 58%",
-        imageFit: "cover",
-        intro: "大家好，我叫张盼，目前在资阳支行工作。在今后的工作当中，我希望能和在座各位同事多沟通、多交流，互相学习取长补短，一同成长进步。后续工作上还有很多需要向大家请教的地方，麻烦各位多多关照。",
-        reflection: "作为一名助理综服经理，学习习近平总书记重要回信精神后我深受触动。我读懂了青年要坚定理想、厚植家国情怀，立足平凡岗位勇担使命。柜台是服务群众的一线，今后我会牢记嘱托，锤炼业务本领，用心办好每一笔业务，耐心服务每一位客户。自觉把金融服务融入民生发展，以踏实实干践行青年责任，用基层金融人的微光，为服务实体经济贡献青春力量。",
-      }
-    : index === 1
-      ? {
-          slot: 2,
-          name: "李思洁",
-          department: "沅江支行营业部",
-          role: "助理综服经理",
-          image: "./people/youth-02.jpg",
-          imagePosition: "50% 50%",
-          imageFit: "contain",
-          intro: "大家好，我是李思洁，2024年加入中国银行，现就职于沅江支行营业部。",
-          reflection: "参加“国家安全，青春挺膺”主题团日活动后，我作为一名助理综服经理深受警醒与启发。金融安全是国家安全的重要一环，柜台是防范金融风险、守护资金安全的前沿阵地。日常工作中，我会严格落实实名制开户、反诈提醒、可疑交易甄别等制度，细心核验客户信息，主动普及反洗钱、电信诈骗、跨境金融风险知识。以青年之责筑牢金融防线，保持警惕如雄鹰瞭望，严守业务操作规范，抵制危害金融安全的违规行为。把国家安全意识融入每一笔业务办理，立足平凡岗位履职尽责，用专业与坚守守护群众财产安全，以青春力量护航国家金融稳定与安全。",
-        }
-      : {
-        slot: index + 1,
-        name: "",
-        department: "",
-        role: "",
-        image: "",
-        imagePosition: "50% 50%",
-        imageFit: "cover",
-        intro: "",
-        reflection: "",
-      }
-));
+import { useEffect, useRef, useState } from "react";
+import { youthProfiles } from "./profiles";
 
 const learningTracks = [
   {
@@ -87,8 +37,86 @@ export default function Home() {
   const [slideDirection, setSlideDirection] = useState<"next" | "previous">("next");
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioContext = useRef<AudioContext | null>(null);
+  const musicTimer = useRef<number | null>(null);
+  const musicStep = useRef(0);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const activeProfile = youthProfiles[activeIndex];
+
+  const stopMusic = () => {
+    if (musicTimer.current !== null) {
+      window.clearInterval(musicTimer.current);
+      musicTimer.current = null;
+    }
+    if (audioContext.current) {
+      void audioContext.current.close();
+      audioContext.current = null;
+    }
+    musicStep.current = 0;
+    setIsMusicPlaying(false);
+  };
+
+  const startMusic = () => {
+    if (audioContext.current) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const context = new AudioContextClass();
+    const masterGain = context.createGain();
+    masterGain.gain.value = 0.055;
+    masterGain.connect(context.destination);
+    audioContext.current = context;
+
+    const chords = [
+      [261.63, 329.63, 392.0],
+      [220.0, 261.63, 329.63],
+      [174.61, 220.0, 261.63],
+      [196.0, 246.94, 293.66],
+    ];
+
+    const playChord = () => {
+      const now = context.currentTime;
+      const chord = chords[musicStep.current % chords.length];
+      chord.forEach((frequency, noteIndex) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = noteIndex === 0 ? "sine" : "triangle";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(noteIndex === 0 ? 0.33 : 0.15, now + 0.65);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.6);
+        oscillator.connect(gain);
+        gain.connect(masterGain);
+        oscillator.start(now);
+        oscillator.stop(now + 4.8);
+      });
+      musicStep.current += 1;
+    };
+
+    void context.resume();
+    playChord();
+    musicTimer.current = window.setInterval(playChord, 4200);
+    setIsMusicPlaying(true);
+  };
+
+  const toggleMusic = () => {
+    if (isMusicPlaying) stopMusic();
+    else startMusic();
+  };
+
+  useEffect(() => {
+    const activateMusic = () => startMusic();
+    document.addEventListener("pointerdown", activateMusic, { once: true });
+    document.addEventListener("keydown", activateMusic, { once: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", activateMusic);
+      document.removeEventListener("keydown", activateMusic);
+      if (musicTimer.current !== null) window.clearInterval(musicTimer.current);
+      if (audioContext.current) void audioContext.current.close();
+    };
+  }, []);
 
   const selectProfile = (index: number, direction?: "next" | "previous") => {
     const nextIndex = (index + youthProfiles.length) % youthProfiles.length;
@@ -108,6 +136,20 @@ export default function Home() {
 
   return (
     <main className="page-shell">
+      <button
+        type="button"
+        className={`music-toggle${isMusicPlaying ? " is-playing" : ""}`}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          toggleMusic();
+        }}
+        aria-label={isMusicPlaying ? "暂停轻音乐" : "播放轻音乐"}
+        aria-pressed={isMusicPlaying}
+      >
+        <span className="music-disc" aria-hidden="true"><i /></span>
+        <span className="music-label">{isMusicPlaying ? "音乐播放中" : "轻音乐"}</span>
+      </button>
       <section className="hero" id="top" aria-labelledby="hero-title">
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-rays" aria-hidden="true" />
@@ -212,7 +254,7 @@ export default function Home() {
             <h2 id="profiles-title">青年学习志</h2>
             <p>19 位青年 · 19 份思考 · 同一束奋进之光</p>
           </div>
-          <div className="profiles-total"><strong>19</strong><span>位青年<br />待启新章</span></div>
+          <div className="profiles-total"><strong>19</strong><span>位青年<br />青春之声</span></div>
         </div>
 
         <div className="profile-index" role="tablist" aria-label="选择青年人物">
@@ -389,7 +431,8 @@ export default function Home() {
         </div>
         <div className="footer-meta">
           <p><span>来源</span>中国银行益阳分行团委</p>
-          <p><span>年度</span>2026</p>
+          <p><span>编辑</span>曾子刚、杨伊静、张盼、杨庆龄</p>
+          <p><span>审核</span>刘娟</p>
         </div>
       </footer>
     </main>
