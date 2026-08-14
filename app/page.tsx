@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { youthProfiles } from "./profiles";
+import { createYouthMusicEngine, type YouthMusicEngine } from "./youth-music";
 
 const learningTracks = [
   {
@@ -38,98 +39,62 @@ export default function Home() {
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const audioContext = useRef<AudioContext | null>(null);
-  const musicTimer = useRef<number | null>(null);
-  const musicStep = useRef(0);
+  const musicEngine = useRef<YouthMusicEngine | null>(null);
+  const musicWanted = useRef(false);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const activeProfile = youthProfiles[activeIndex];
 
   const stopMusic = () => {
-    if (musicTimer.current !== null) {
-      window.clearInterval(musicTimer.current);
-      musicTimer.current = null;
-    }
-    if (audioContext.current) {
-      void audioContext.current.close();
-      audioContext.current = null;
-    }
-    musicStep.current = 0;
+    musicWanted.current = false;
+    musicEngine.current?.pause();
     setIsMusicPlaying(false);
   };
 
   const startMusic = () => {
-    if (audioContext.current) return;
+    musicWanted.current = true;
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
+    if (!AudioContextClass) {
+      musicWanted.current = false;
+      return;
+    }
 
-    const context = new AudioContextClass();
-    const masterGain = context.createGain();
-    const lowPass = context.createBiquadFilter();
-    const compressor = context.createDynamicsCompressor();
-    masterGain.gain.value = 0.052;
-    lowPass.type = "lowpass";
-    lowPass.frequency.value = 4200;
-    lowPass.Q.value = 0.45;
-    compressor.threshold.value = -20;
-    compressor.knee.value = 14;
-    compressor.ratio.value = 2.4;
-    compressor.attack.value = 0.08;
-    compressor.release.value = 0.35;
-    masterGain.connect(lowPass);
-    lowPass.connect(compressor);
-    compressor.connect(context.destination);
-    audioContext.current = context;
-
-    const melodyPatterns = [
-      [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 392.0],
-      [220.0, 261.63, 329.63, 440.0, 329.63, 261.63, 246.94, 329.63],
-      [349.23, 440.0, 523.25, 698.46, 523.25, 440.0, 392.0, 523.25],
-      [392.0, 493.88, 587.33, 783.99, 587.33, 493.88, 440.0, 587.33],
-    ];
-
-    const playPhrase = () => {
-      const now = context.currentTime + 0.02;
-      const pattern = melodyPatterns[musicStep.current % melodyPatterns.length];
-      pattern.forEach((frequency, noteIndex) => {
-        const noteStart = now + noteIndex * 0.27;
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        oscillator.type = noteIndex % 4 === 0 ? "triangle" : "sine";
-        oscillator.frequency.value = frequency;
-        oscillator.detune.value = noteIndex % 2 ? 2 : -2;
-        const peak = noteIndex % 4 === 0 ? 0.17 : 0.11;
-        gain.gain.setValueAtTime(0.0001, noteStart);
-        gain.gain.exponentialRampToValueAtTime(peak, noteStart + 0.035);
-        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.78);
-        oscillator.connect(gain);
-        gain.connect(masterGain);
-        oscillator.start(noteStart);
-        oscillator.stop(noteStart + 0.82);
-      });
-      musicStep.current += 1;
-    };
-
-    void context.resume();
-    playPhrase();
-    musicTimer.current = window.setInterval(playPhrase, 2160);
-    setIsMusicPlaying(true);
+    const engine = musicEngine.current ?? createYouthMusicEngine(new AudioContextClass());
+    musicEngine.current = engine;
+    void engine.start().then((started) => {
+      if (musicEngine.current !== engine || !musicWanted.current) {
+        if (started) engine.pause();
+        return;
+      }
+      setIsMusicPlaying(started);
+      if (!started) musicWanted.current = false;
+    });
   };
 
   const toggleMusic = () => {
-    if (isMusicPlaying) stopMusic();
+    if (musicWanted.current) stopMusic();
     else startMusic();
   };
 
   useEffect(() => {
     const activateMusic = () => startMusic();
+    const syncMusicWithVisibility = () => {
+      if (document.hidden) {
+        if (musicWanted.current) musicEngine.current?.pause();
+      } else if (musicWanted.current) {
+        startMusic();
+      }
+    };
     document.addEventListener("pointerdown", activateMusic, { once: true });
     document.addEventListener("keydown", activateMusic, { once: true });
+    document.addEventListener("visibilitychange", syncMusicWithVisibility);
 
     return () => {
       document.removeEventListener("pointerdown", activateMusic);
       document.removeEventListener("keydown", activateMusic);
-      if (musicTimer.current !== null) window.clearInterval(musicTimer.current);
-      if (audioContext.current) void audioContext.current.close();
+      document.removeEventListener("visibilitychange", syncMusicWithVisibility);
+      musicWanted.current = false;
+      musicEngine.current?.destroy();
+      musicEngine.current = null;
     };
   }, []);
 
