@@ -199,10 +199,11 @@ img { display: block; max-width: 100%; }
   margin-top: 14px;
   color: var(--gold-light);
   font-family: "Kaiti SC", KaiTi, serif;
-  font-size: clamp(26px, 6vw, 42px);
+  font-size: clamp(18px, 4.6vw, 30px);
   font-style: normal;
   font-weight: 500;
-  letter-spacing: .5em;
+  letter-spacing: .18em;
+  line-height: 1.35;
 }
 
 .hero-slogan {
@@ -542,7 +543,7 @@ img { display: block; max-width: 100%; }
   .hero-content { min-height: 660px; padding-top: 52px; }
   .brand-copy small { display: none; }
   .hero h1 span { font-size: clamp(62px, 19vw, 92px); }
-  .hero h1 em { letter-spacing: .36em; }
+  .hero h1 em { font-size: clamp(18px, 5vw, 23px); letter-spacing: .12em; }
   .hero-slogan { flex-direction: column; }
   .mission-layout { grid-template-columns: 1fr; gap: 28px; margin-top: 42px; }
   .track-grid { grid-template-columns: 1fr; }

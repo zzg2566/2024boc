@@ -66,52 +66,52 @@ export default function Home() {
     const masterGain = context.createGain();
     const lowPass = context.createBiquadFilter();
     const compressor = context.createDynamicsCompressor();
-    masterGain.gain.value = 0.038;
+    masterGain.gain.value = 0.052;
     lowPass.type = "lowpass";
-    lowPass.frequency.value = 1800;
-    lowPass.Q.value = 0.6;
-    compressor.threshold.value = -24;
-    compressor.knee.value = 18;
-    compressor.ratio.value = 3;
-    compressor.attack.value = 0.18;
-    compressor.release.value = 0.7;
+    lowPass.frequency.value = 4200;
+    lowPass.Q.value = 0.45;
+    compressor.threshold.value = -20;
+    compressor.knee.value = 14;
+    compressor.ratio.value = 2.4;
+    compressor.attack.value = 0.08;
+    compressor.release.value = 0.35;
     masterGain.connect(lowPass);
     lowPass.connect(compressor);
     compressor.connect(context.destination);
     audioContext.current = context;
 
-    const chords = [
-      [130.81, 196.0, 261.63, 329.63],
-      [110.0, 164.81, 220.0, 261.63],
-      [87.31, 130.81, 174.61, 220.0],
-      [98.0, 146.83, 196.0, 246.94],
+    const melodyPatterns = [
+      [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 392.0],
+      [220.0, 261.63, 329.63, 440.0, 329.63, 261.63, 246.94, 329.63],
+      [349.23, 440.0, 523.25, 698.46, 523.25, 440.0, 392.0, 523.25],
+      [392.0, 493.88, 587.33, 783.99, 587.33, 493.88, 440.0, 587.33],
     ];
 
-    const playChord = () => {
+    const playPhrase = () => {
       const now = context.currentTime + 0.02;
-      const chord = chords[musicStep.current % chords.length];
-      chord.forEach((frequency, noteIndex) => {
+      const pattern = melodyPatterns[musicStep.current % melodyPatterns.length];
+      pattern.forEach((frequency, noteIndex) => {
+        const noteStart = now + noteIndex * 0.27;
         const oscillator = context.createOscillator();
         const gain = context.createGain();
-        oscillator.type = noteIndex < 2 ? "sine" : "triangle";
+        oscillator.type = noteIndex % 4 === 0 ? "triangle" : "sine";
         oscillator.frequency.value = frequency;
-        oscillator.detune.value = noteIndex % 2 ? 3 : -3;
-        const peak = noteIndex === 0 ? 0.24 : 0.1;
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(peak, now + 1.1);
-        gain.gain.setValueAtTime(peak, now + 3.8);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 7.2);
+        oscillator.detune.value = noteIndex % 2 ? 2 : -2;
+        const peak = noteIndex % 4 === 0 ? 0.17 : 0.11;
+        gain.gain.setValueAtTime(0.0001, noteStart);
+        gain.gain.exponentialRampToValueAtTime(peak, noteStart + 0.035);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.78);
         oscillator.connect(gain);
         gain.connect(masterGain);
-        oscillator.start(now);
-        oscillator.stop(now + 7.35);
+        oscillator.start(noteStart);
+        oscillator.stop(noteStart + 0.82);
       });
       musicStep.current += 1;
     };
 
     void context.resume();
-    playChord();
-    musicTimer.current = window.setInterval(playChord, 3600);
+    playPhrase();
+    musicTimer.current = window.setInterval(playPhrase, 2160);
     setIsMusicPlaying(true);
   };
 
@@ -188,7 +188,7 @@ export default function Home() {
           <p className="hero-kicker"><span>BOC YOUTH</span> 理论学习专栏</p>
           <h1 id="hero-title">
             <span>青学笃行</span>
-            <em>青年学习</em>
+            <em>2024届青年员工学习专栏</em>
           </h1>
           <div className="hero-slogan">
             <span>思想之光照亮奋进之路</span>

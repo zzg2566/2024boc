@@ -80,6 +80,7 @@ const updateStaticHtml = (sourceHtml) => {
       '<main class="page-shell">',
       '<main class="page-shell"><button type="button" class="music-toggle" aria-label="播放轻音乐" aria-pressed="false"><span class="music-disc" aria-hidden="true"><i></i></span><span class="music-label">轻音乐</span></button>',
     )
+    .replaceAll("<em>青年学习</em>", "<em>2024届青年员工学习专栏</em>")
     .replace("位青年<br/>待启新章", "位青年<br/>青春之声")
     .replaceAll("助理综服经理", "助理综合服务经理")
     .replace(
