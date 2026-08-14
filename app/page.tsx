@@ -64,39 +64,54 @@ export default function Home() {
 
     const context = new AudioContextClass();
     const masterGain = context.createGain();
-    masterGain.gain.value = 0.055;
-    masterGain.connect(context.destination);
+    const lowPass = context.createBiquadFilter();
+    const compressor = context.createDynamicsCompressor();
+    masterGain.gain.value = 0.038;
+    lowPass.type = "lowpass";
+    lowPass.frequency.value = 1800;
+    lowPass.Q.value = 0.6;
+    compressor.threshold.value = -24;
+    compressor.knee.value = 18;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.18;
+    compressor.release.value = 0.7;
+    masterGain.connect(lowPass);
+    lowPass.connect(compressor);
+    compressor.connect(context.destination);
     audioContext.current = context;
 
     const chords = [
-      [261.63, 329.63, 392.0],
-      [220.0, 261.63, 329.63],
-      [174.61, 220.0, 261.63],
-      [196.0, 246.94, 293.66],
+      [130.81, 196.0, 261.63, 329.63],
+      [110.0, 164.81, 220.0, 261.63],
+      [87.31, 130.81, 174.61, 220.0],
+      [98.0, 146.83, 196.0, 246.94],
     ];
 
     const playChord = () => {
-      const now = context.currentTime;
+      const now = context.currentTime + 0.02;
       const chord = chords[musicStep.current % chords.length];
       chord.forEach((frequency, noteIndex) => {
         const oscillator = context.createOscillator();
         const gain = context.createGain();
-        oscillator.type = noteIndex === 0 ? "sine" : "triangle";
+        oscillator.type = noteIndex < 2 ? "sine" : "triangle";
         oscillator.frequency.value = frequency;
+        oscillator.detune.value = noteIndex % 2 ? 3 : -3;
+        const peak = noteIndex === 0 ? 0.24 : 0.1;
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(noteIndex === 0 ? 0.33 : 0.15, now + 0.65);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.6);
+        gain.gain.exponentialRampToValueAtTime(peak, now + 1.1);
+        gain.gain.setValueAtTime(peak, now + 3.8);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 7.2);
         oscillator.connect(gain);
         gain.connect(masterGain);
         oscillator.start(now);
-        oscillator.stop(now + 4.8);
+        oscillator.stop(now + 7.35);
       });
       musicStep.current += 1;
     };
 
     void context.resume();
     playChord();
-    musicTimer.current = window.setInterval(playChord, 4200);
+    musicTimer.current = window.setInterval(playChord, 3600);
     setIsMusicPlaying(true);
   };
 
@@ -159,7 +174,7 @@ export default function Home() {
         <header className="brand-bar">
           <a className="brand" href="#top" aria-label="返回页面顶部">
             <span className="brand-mark">
-              <img src="/boc-logo.jpg" alt="" />
+              <img src="./boc-logo.jpg" alt="" />
             </span>
             <span className="brand-copy">
               <strong>中国银行益阳分行</strong>
@@ -298,10 +313,13 @@ export default function Home() {
           </button>
         </div>
 
+        {/* The profile panel is focusable so keyboard and touch users share the same previous/next navigation. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <article
           className={`profile-stage slide-${slideDirection}${isDragging ? " is-dragging" : ""}`}
           key={activeProfile.slot}
           id="profile-stage"
+          role="tabpanel"
           tabIndex={0}
           aria-live="polite"
           aria-atomic="true"
@@ -350,23 +368,24 @@ export default function Home() {
             setDragOffset(0);
           }}
         >
-          <div className={`profile-visual fit-${activeProfile.imageFit}`}>
+          <div className={`profile-visual photo-${activeProfile.imageLayout} fit-${activeProfile.imageFit}`}>
             {activeProfile.image ? (
               <>
-                {activeProfile.imageFit === "contain" && (
-                  <img
-                    className="profile-photo-backdrop"
-                    src={activeProfile.image}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                )}
                 <img
-                  className="profile-photo"
+                  className="profile-photo-backdrop"
                   src={activeProfile.image}
-                  alt={`${activeProfile.name}工作照`}
                   style={{ objectPosition: activeProfile.imagePosition }}
+                  alt=""
+                  aria-hidden="true"
                 />
+                <div className="profile-photo-frame">
+                  <img
+                    className="profile-photo"
+                    src={activeProfile.image}
+                    alt={`${activeProfile.name}个人照片`}
+                    style={{ objectPosition: activeProfile.imagePosition }}
+                  />
+                </div>
               </>
             ) : (
               <div className="photo-placeholder">
