@@ -76,7 +76,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const activateMusic = () => startMusic();
+    // Auto-start on the first interaction anywhere EXCEPT the music toggle:
+    // the toggle's own click handler manages playback, and letting both fire
+    // would start-then-stop the music within a single tap.
+    const activateMusic = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest(".music-toggle")) return;
+      startMusic();
+    };
     const syncMusicWithVisibility = () => {
       if (document.hidden) {
         if (musicWanted.current) musicEngine.current?.pause();
@@ -119,11 +125,7 @@ export default function Home() {
       <button
         type="button"
         className={`music-toggle${isMusicPlaying ? " is-playing" : ""}`}
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={(event) => {
-          event.stopPropagation();
-          toggleMusic();
-        }}
+        onClick={toggleMusic}
         aria-label={isMusicPlaying ? "暂停轻音乐" : "播放轻音乐"}
         aria-pressed={isMusicPlaying}
       >

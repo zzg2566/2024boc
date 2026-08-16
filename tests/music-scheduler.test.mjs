@@ -20,7 +20,8 @@ test("lookahead scheduling remains sample-clock aligned through timer jitter", (
   let position = { nextNoteTime: MUSIC_TIMING.startDelaySeconds, step: 0 };
   const onsets = [];
 
-  while (now < 30) {
+  // Collect a fixed number of onsets so the assertion stays valid at any tempo.
+  while (onsets.length <= 120 && now < 300) {
     const plan = planMusicWindow(position, now);
     onsets.push(...plan.events.map((event) => event.time));
     position = { nextNoteTime: plan.nextNoteTime, step: plan.step };

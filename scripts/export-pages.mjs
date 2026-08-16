@@ -69,6 +69,21 @@ const replaceClientAssets = async (html) => {
   );
 };
 
+// The client runtime preloads dependent chunks from the site root ("/_next/…"),
+// which 404s on GitHub Pages because the site lives under "/2024boc/". Rewrite
+// the preload manifest inside the index chunk so hydration can finish and the
+// page becomes interactive (music toggle, profile navigation, etc.).
+const patchIndexChunkBase = async (html) => {
+  const indexTarget = html.match(/\/2024boc\/(_next\/static\/chunks\/index-[^"]+\.js)/)?.[1];
+  if (!indexTarget) throw new Error("Unable to find the index chunk name");
+
+  const indexPath = resolve(outputDir, indexTarget);
+  const source = await readFile(indexPath, "utf8");
+  const patched = source.replaceAll('"_next/static/chunks/', '"2024boc/_next/static/chunks/');
+  if (patched === source) throw new Error("Index chunk did not contain root-relative preload paths");
+  await writeFile(indexPath, patched, "utf8");
+};
+
 const updateStaticHtml = (sourceHtml) => {
   const names = [
     "张盼", "李思洁", "曹林生", "陈静漪", "胡文祥", "李慢严", "李依", "梁佳", "廖雅晴",
@@ -109,6 +124,7 @@ await copyPublicAssets();
 
 const originalHtml = await readFile(resolve(outputDir, "index.html"), "utf8");
 await replaceClientAssets(originalHtml);
+await patchIndexChunkBase(originalHtml);
 const html = updateStaticHtml(originalHtml);
 
 await writeFile(resolve(outputDir, "index.html"), html, "utf8");
