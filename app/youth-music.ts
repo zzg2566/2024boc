@@ -109,7 +109,6 @@ export function createYouthMusicEngine(context: AudioContext) {
   let running = false;
   let destroyed = false;
   let generation = 0;
-  let startPromise: Promise<boolean> | null = null;
 
   const clearScheduler = () => {
     if (schedulerTimer !== null) {
@@ -227,7 +226,6 @@ export function createYouthMusicEngine(context: AudioContext) {
   const start = () => {
     if (destroyed || context.state === "closed") return Promise.resolve(false);
     if (running && context.state === "running") return Promise.resolve(true);
-    if (startPromise) return startPromise;
 
     clearPauseTimer();
     const token = ++generation;
@@ -250,12 +248,10 @@ export function createYouthMusicEngine(context: AudioContext) {
       return true;
     };
 
-    const pending = begin();
-    startPromise = pending;
-    void pending.finally(() => {
-      if (startPromise === pending) startPromise = null;
-    });
-    return pending;
+    // Do not reuse a resume promise created by an autoplay attempt. Browsers
+    // may leave that promise pending until a user gesture, and the click must
+    // be allowed to call resume() again inside the gesture event itself.
+    return begin();
   };
 
   const pause = () => {

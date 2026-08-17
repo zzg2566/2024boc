@@ -66,12 +66,14 @@ export default function Home() {
         return;
       }
       setIsMusicPlaying(started);
-      if (!started) musicWanted.current = false;
     });
   };
 
   const toggleMusic = () => {
-    if (musicWanted.current) stopMusic();
+    // `musicWanted` can already be true while autoplay is still blocked by the
+    // browser. Only treat the button as a pause action when audio is actually
+    // running; otherwise this click is the user gesture that starts it.
+    if (musicEngine.current?.isRunning) stopMusic();
     else startMusic();
   };
 
@@ -85,12 +87,16 @@ export default function Home() {
     // toggle: the toggle's own click handler manages playback, and letting
     // both fire would start-then-stop the music within a single tap.
     const activateMusic = (event: Event) => {
+      if (!musicWanted.current) return;
       if (event.target instanceof Element && event.target.closest(".music-toggle")) return;
       startMusic();
     };
     const syncMusicWithVisibility = () => {
       if (document.hidden) {
-        if (musicWanted.current) musicEngine.current?.pause();
+        if (musicWanted.current) {
+          musicEngine.current?.pause();
+          setIsMusicPlaying(false);
+        }
       } else if (musicWanted.current) {
         startMusic();
       }
