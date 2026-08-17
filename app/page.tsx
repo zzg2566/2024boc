@@ -76,9 +76,14 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Auto-start on the first interaction anywhere EXCEPT the music toggle:
-    // the toggle's own click handler manages playback, and letting both fire
-    // would start-then-stop the music within a single tap.
+    // Try to autoplay as soon as the page opens. Browsers that block audio
+    // without a user gesture keep the AudioContext suspended; the pending
+    // start then resolves on the first interaction via the listeners below.
+    startMusic();
+
+    // Fallback: auto-start on the first interaction anywhere EXCEPT the music
+    // toggle: the toggle's own click handler manages playback, and letting
+    // both fire would start-then-stop the music within a single tap.
     const activateMusic = (event: Event) => {
       if (event.target instanceof Element && event.target.closest(".music-toggle")) return;
       startMusic();

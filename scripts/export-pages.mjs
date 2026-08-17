@@ -44,20 +44,42 @@ const copyPublicAssets = async () => {
   }
 };
 
+// Fresh builds emit chunk file names with an extra content-hash suffix
+// (e.g. "framework-BgSIrAUN-DdcWCAFw.js") while index.html and the tracked
+// pages/ directory reference stable names ("framework-BgSIrAUN.js"), and the
+// chunks cross-reference each other with the suffixed names. Copy every built
+// chunk into pages/ — suffixed names land on their stable counterpart — then
+// rewrite all cross references inside the shipped chunks to those names.
+const syncClientChunks = async () => {
+  const builtChunkDir = resolve(clientDir, "_next", "static", "chunks");
+  const pagesChunkDir = resolve(outputDir, "_next", "static", "chunks");
+  const stableNames = (await readdir(pagesChunkDir)).filter((f) => f.endsWith(".js"));
+  const builtFiles = (await readdir(builtChunkDir)).filter((f) => f.endsWith(".js"));
+
+  const nameMap = new Map();
+  for (const file of builtFiles) {
+    const stem = file.slice(0, -".js".length);
+    const stable = stableNames.find((s) => s === file || stem.startsWith(s.slice(0, -".js".length)));
+    nameMap.set(file, stable ?? file);
+  }
+
+  for (const [built, target] of nameMap) {
+    await cp(resolve(builtChunkDir, built), resolve(pagesChunkDir, target), { force: true });
+  }
+
+  for (const target of new Set(nameMap.values())) {
+    const targetPath = resolve(pagesChunkDir, target);
+    let contents = await readFile(targetPath, "utf8");
+    for (const [built, mapped] of nameMap) {
+      if (built !== mapped) contents = contents.replaceAll(built, mapped);
+    }
+    await writeFile(targetPath, contents, "utf8");
+  }
+};
+
 const replaceClientAssets = async (html) => {
-  const manifest = JSON.parse(await readFile(resolve(clientDir, ".vite", "manifest.json"), "utf8"));
-  const pageEntry = Object.values(manifest).find((entry) => entry.src === "app/page.tsx");
-  if (!pageEntry?.file) throw new Error("Unable to find the app/page.tsx client entry");
-
-  const pageTarget = html.match(/\/2024boc\/(_next\/static\/chunks\/page-[^"]+\.js)/)?.[1];
   const cssTarget = html.match(/\/2024boc\/(_next\/static\/css\/index\.[^"]+\.css)/)?.[1];
-  if (!pageTarget || !cssTarget) throw new Error("Unable to find the stable GitHub Pages asset names");
-
-  let pageChunk = await readFile(resolve(clientDir, pageEntry.file), "utf8");
-  pageChunk = pageChunk
-    .replace(/rolldown-runtime-[^"]+\.js/, "rolldown-runtime-C60lm6uB.js")
-    .replace(/framework-[^"]+\.js/, "framework-BgSIrAUN.js");
-  await writeFile(resolve(outputDir, pageTarget), pageChunk, "utf8");
+  if (!cssTarget) throw new Error("Unable to find the stable GitHub Pages stylesheet name");
 
   const cssFiles = (await readdir(resolve(clientDir, "_next", "static", "css")))
     .filter((fileName) => fileName.endsWith(".css"));
@@ -123,6 +145,7 @@ await restoreTrackedPages();
 await copyPublicAssets();
 
 const originalHtml = await readFile(resolve(outputDir, "index.html"), "utf8");
+await syncClientChunks();
 await replaceClientAssets(originalHtml);
 await patchIndexChunkBase(originalHtml);
 const html = updateStaticHtml(originalHtml);
