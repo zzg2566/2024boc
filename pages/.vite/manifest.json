@@ -1,49 +1,132 @@
 {
-  "_framework-BgSIrAUN.js": {
-    "file": "_next/static/chunks/framework-BgSIrAUN.js",
+  "_base-path-DhJ34XTd.js": {
+    "file": "2024boc/_next/static/chunks/base-path-DhJ34XTd.js",
+    "name": "base-path"
+  },
+  "_framework-BtdPpASO.js": {
+    "file": "2024boc/_next/static/chunks/framework-BtdPpASO.js",
     "name": "framework",
     "imports": [
-      "_rolldown-runtime-C60lm6uB.js"
+      "_rolldown-runtime-DDO6Y6PP.js"
     ]
   },
-  "_rolldown-runtime-C60lm6uB.js": {
-    "file": "_next/static/chunks/rolldown-runtime-C60lm6uB.js",
+  "_navigation-Dn4EMOG3.js": {
+    "file": "2024boc/_next/static/chunks/navigation-Dn4EMOG3.js",
+    "name": "navigation",
+    "imports": [
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_preload-helper-qwXxhTVT.js",
+      "_framework-BtdPpASO.js",
+      "_base-path-DhJ34XTd.js"
+    ],
+    "dynamicImports": [
+      "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/internal/hybrid-client-route-owner.js"
+    ]
+  },
+  "_preload-helper-qwXxhTVT.js": {
+    "file": "2024boc/_next/static/chunks/preload-helper-qwXxhTVT.js",
+    "name": "preload-helper",
+    "imports": [
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_framework-BtdPpASO.js",
+      "_base-path-DhJ34XTd.js"
+    ]
+  },
+  "_rolldown-runtime-DDO6Y6PP.js": {
+    "file": "2024boc/_next/static/chunks/rolldown-runtime-DDO6Y6PP.js",
     "name": "rolldown-runtime"
   },
   "app/page.tsx": {
-    "file": "_next/static/chunks/page-BX_Hku1N.js",
+    "file": "2024boc/_next/static/chunks/page-_mN7KWFg.js",
     "name": "page",
     "src": "app/page.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-C60lm6uB.js",
-      "_framework-BgSIrAUN.js"
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_framework-BtdPpASO.js"
+    ]
+  },
+  "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/config/config-matchers.js": {
+    "file": "2024boc/_next/static/chunks/config-matchers-C_kYHNla.js",
+    "name": "config-matchers",
+    "src": "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/config/config-matchers.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "virtual:vinext-client-entry",
+      "_preload-helper-qwXxhTVT.js"
+    ]
+  },
+  "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/error.js": {
+    "file": "2024boc/_next/static/chunks/error-B8xAoj1w.js",
+    "name": "error",
+    "src": "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/error.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "virtual:vinext-client-entry",
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_navigation-Dn4EMOG3.js",
+      "_preload-helper-qwXxhTVT.js",
+      "_framework-BtdPpASO.js"
+    ]
+  },
+  "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/internal/hybrid-client-route-owner.js": {
+    "file": "2024boc/_next/static/chunks/hybrid-client-route-owner-BclRvXP4.js",
+    "name": "hybrid-client-route-owner",
+    "src": "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/internal/hybrid-client-route-owner.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "virtual:vinext-client-entry",
+      "_preload-helper-qwXxhTVT.js",
+      "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/config/config-matchers.js"
     ]
   },
   "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/layout-segment-context.js": {
-    "file": "_next/static/chunks/layout-segment-context-LC0i8bLG.js",
+    "file": "2024boc/_next/static/chunks/layout-segment-context-CDFQJw8L.js",
     "name": "layout-segment-context",
     "src": "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/layout-segment-context.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-C60lm6uB.js",
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_navigation-Dn4EMOG3.js",
       "virtual:vinext-app-browser-entry",
-      "_framework-BgSIrAUN.js"
+      "_framework-BtdPpASO.js"
     ]
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "_next/static/chunks/index-B9B0y_Ay.js",
+    "file": "2024boc/_next/static/chunks/index-Bxn4lUFX.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,
     "imports": [
-      "_rolldown-runtime-C60lm6uB.js",
-      "_framework-BgSIrAUN.js"
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_navigation-Dn4EMOG3.js",
+      "_preload-helper-qwXxhTVT.js",
+      "_framework-BtdPpASO.js",
+      "_base-path-DhJ34XTd.js"
     ],
     "dynamicImports": [
       "virtual:vinext-app-browser-entry",
+      "_navigation-Dn4EMOG3.js",
       "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/layout-segment-context.js",
       "app/page.tsx"
+    ]
+  },
+  "virtual:vinext-client-entry": {
+    "file": "2024boc/_next/static/chunks/vinext-client-entry-quBERJAB.js",
+    "name": "vinext-client-entry",
+    "src": "virtual:vinext-client-entry",
+    "isEntry": true,
+    "imports": [
+      "_rolldown-runtime-DDO6Y6PP.js",
+      "_preload-helper-qwXxhTVT.js",
+      "_framework-BtdPpASO.js",
+      "_base-path-DhJ34XTd.js"
+    ],
+    "dynamicImports": [
+      "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/internal/hybrid-client-route-owner.js",
+      "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/config/config-matchers.js",
+      "_framework-BtdPpASO.js",
+      "node_modules/.pnpm/vinext@1.0.0-beta.2_@vitejs_46827034ea015a21abf9c268cda9eaa9/node_modules/vinext/dist/shims/error.js"
     ]
   }
 }

@@ -11,7 +11,8 @@
     "build": "vinext build",
     "export:pages": "node scripts/export-pages.mjs",
     "start": "vinext start",
-    "test": "vinext build && node --test tests/rendered-html.test.mjs",
+    "test": "vinext build && node scripts/export-pages.mjs && node --test",
+    "test:static": "node --test tests/static-export.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },
