@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
@@ -67,14 +68,28 @@ const syncClientChunks = async () => {
     await cp(resolve(builtChunkDir, built), resolve(pagesChunkDir, target), { force: true });
   }
 
-  for (const target of new Set(nameMap.values())) {
+  // Cache-busting fingerprint: derived from the built file names (they carry
+  // content hashes), so any code change produces a new one. Appended as a
+  // "?v=" query to every chunk URL — browsers and WeChat WebViews treat it as
+  // a new resource and skip their stale cache.
+  const buildFingerprint = createHash("sha256")
+    .update(builtFiles.slice().sort().join("\n"))
+    .digest("hex")
+    .slice(0, 12);
+  const finalNames = new Set(nameMap.values());
+
+  for (const target of finalNames) {
     const targetPath = resolve(pagesChunkDir, target);
     let contents = await readFile(targetPath, "utf8");
     for (const [built, mapped] of nameMap) {
       if (built !== mapped) contents = contents.replaceAll(built, mapped);
     }
+    for (const name of finalNames) {
+      contents = contents.replaceAll(name, `${name}?v=${buildFingerprint}`);
+    }
     await writeFile(targetPath, contents, "utf8");
   }
+  return buildFingerprint;
 };
 
 const replaceClientAssets = async (html) => {
@@ -106,7 +121,7 @@ const patchIndexChunkBase = async (html) => {
   await writeFile(indexPath, patched, "utf8");
 };
 
-const updateStaticHtml = (sourceHtml) => {
+const updateStaticHtml = (sourceHtml, buildFingerprint) => {
   const names = [
     "张盼", "李思洁", "曹林生", "陈静漪", "胡文祥", "李慢严", "李依", "梁佳", "廖雅晴",
     "刘湘粤", "刘亚彪", "王敏琪", "王智文", "夏清华", "薛子康", "杨庆龄", "杨伊静", "易思佳", "张博英",
@@ -137,7 +152,12 @@ const updateStaticHtml = (sourceHtml) => {
     );
   });
 
-  return html;
+  // Append the build fingerprint to every static asset URL in the HTML so a
+  // new deploy is picked up immediately instead of hitting stale caches.
+  return html.replace(
+    /(\/2024boc\/_next\/static\/[\w./-]+\.(?:js|css))/g,
+    `$1?v=${buildFingerprint}`,
+  );
 };
 
 await rm(outputDir, { recursive: true, force: true });
@@ -145,10 +165,10 @@ await restoreTrackedPages();
 await copyPublicAssets();
 
 const originalHtml = await readFile(resolve(outputDir, "index.html"), "utf8");
-await syncClientChunks();
+const buildFingerprint = await syncClientChunks();
 await replaceClientAssets(originalHtml);
 await patchIndexChunkBase(originalHtml);
-const html = updateStaticHtml(originalHtml);
+const html = updateStaticHtml(originalHtml, buildFingerprint);
 
 await writeFile(resolve(outputDir, "index.html"), html, "utf8");
 await writeFile(resolve(outputDir, "404.html"), html, "utf8");
